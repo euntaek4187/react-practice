@@ -5,15 +5,18 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { useState } from 'react';
 import {a, b, data} from './data';
+import Card from './components/card';
 import Main from './routes/main';
 import Detail from './routes/detail';
 import Event from './routes/event';
 import About from './routes/about';
 import {Routes, Route, Link, useNavigate, Outlet} from 'react-router-dom'
+import axios from 'axios';
 
 function App() {
 
-  let [shoes] = useState(data);
+  let [shoes, setshoes] = useState(data);
+  let [resCount, setResCount] = useState(2);
   let navigate = useNavigate();
 
   return (
@@ -30,6 +33,19 @@ function App() {
           </Nav>
         </Container>
       </Navbar>
+
+      <button onClick={()=>{
+        if (resCount < 4) {
+          axios.get(`https://codingapple1.github.io/shop/data${resCount}.json`)
+          .then((res)=>{
+            setshoes([...shoes, ...res.data]);
+            setResCount(resCount + 1);
+          })
+          .catch((error)=>{
+            // 오류 처리
+          })
+        }
+      }}></button>
 
       <Routes>
         <Route path='/' element={<Main shoes={shoes}></Main>}></Route>
