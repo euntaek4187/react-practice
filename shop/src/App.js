@@ -3,9 +3,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {a, b, data} from './data';
-import Card from './components/card';
+import Cart from './routes/Cart';
 import Main from './routes/main';
 import Detail from './routes/detail';
 import Event from './routes/event';
@@ -14,6 +14,10 @@ import {Routes, Route, Link, useNavigate, Outlet} from 'react-router-dom'
 import axios from 'axios';
 
 function App() {
+
+  useEffect(()=>{
+    localStorage.setItem('watched', JSON.stringify([]));
+  }, [])
 
   let [shoes, setshoes] = useState(data);
   let [resCount, setResCount] = useState(2);
@@ -30,6 +34,7 @@ function App() {
             <Nav.Link onClick={()=>navigate('/detail')}>Detail</Nav.Link>
             <Nav.Link onClick={()=>navigate('/about')}>About</Nav.Link>
             <Nav.Link onClick={()=>navigate('/event')}>Event</Nav.Link>
+            <Nav.Link onClick={()=>navigate('/cart')}>Cart</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
@@ -58,8 +63,7 @@ function App() {
           <Route path='apple' element={<div>사과 할인</div>}></Route>
           <Route path='banana' element={<div>바나나 할인</div>}></Route>
         </Route>
-
-
+        <Route path='/cart' element={<Cart></Cart>}></Route>
       </Routes>
 
     </div>

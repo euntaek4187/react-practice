@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Nav from 'react-bootstrap/Nav';
 import styled from 'styled-components'
+import { addItem } from "../store";
+import { useDispatch } from "react-redux";
 
 function Detail(props){
 
     let [alert, setalert] = useState(true);
     let [count] = useState(0);
     let [tap, setTap] = useState(0);
+    let dispatch = useDispatch()
 
     useEffect(()=>{
         setTimeout( ()=>{setalert(false)}, 2000);
@@ -22,6 +25,15 @@ function Detail(props){
     let findId = props.shoes.find(function(x){
         return x.id == id
       });
+
+    useEffect(()=>{
+        let a = localStorage.getItem('watched')
+        a = JSON.parse(a);
+        a.push(findId.id);
+        a = new Set(a);
+        a = Array.from(a);
+        localStorage.setItem('watched', JSON.stringify(a));
+    }, []);
 
     return (
         <div className="container">
@@ -40,7 +52,9 @@ function Detail(props){
             <h4 className="pt-5">{findId.title}</h4>
             <p>{findId.content}</p>
             <p>{findId.price}</p>
-            <button className="btn btn-danger">주문하기</button> 
+            <button onClick={()=>{
+                dispatch(addItem({id: id, name: findId.title, count: 0}));
+            }} className="btn btn-danger">주문하기</button> 
             </div>
         </div>
 
@@ -60,13 +74,22 @@ function Detail(props){
     );
 }
 function TabContainer({tap}){
-    if(tap == 0){
-        return <div>content0</div>
-    } else if(tap == 1){
-        return <div>content1</div>
-    } else if(tap == 2){
-        return <div>content2</div>
-    }
+
+    let [fade, setFade] = useState('')
+
+    useEffect(() => {
+        setTimeout(() => {setFade('end')}, 100)
+
+        return ()=>{
+            setFade('')
+        }
+    }, [tap])
+
+    return (<div className={'start ' + fade}>
+        {
+            [<div>content0</div>, <div>content0</div>, <div>content0</div>][tap]
+        }
+    </div>)
 }
 
 export default Detail;
