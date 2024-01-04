@@ -5,13 +5,20 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { useEffect, useState } from 'react';
 import {a, b, data} from './data';
-import Cart from './routes/Cart';
+// import Cart from './routes/Cart';
 import Main from './routes/main';
-import Detail from './routes/detail';
+// import Detail from './routes/detail';
 import Event from './routes/event';
 import About from './routes/about';
 import {Routes, Route, Link, useNavigate, Outlet} from 'react-router-dom'
 import axios from 'axios';
+import { useQuery } from 'react-query';
+
+import {lazy, Suspense} from 'react'
+
+const Detail = lazy( () => import('./routes/detail.js') )
+const Cart = lazy( () => import('./routes/Cart.js') )
+
 
 function App() {
 
@@ -22,6 +29,12 @@ function App() {
   let [shoes, setshoes] = useState(data);
   let [resCount, setResCount] = useState(2);
   let navigate = useNavigate();
+
+  let result = useQuery('작명', ()=>
+    axios.get('https://codingapple1.github.io/userdata.json')
+    .then((a)=>{ return a.data }),
+    {staleTime: 2000}
+  )
 
   return (
     <div className="App">
@@ -35,6 +48,9 @@ function App() {
             <Nav.Link onClick={()=>navigate('/about')}>About</Nav.Link>
             <Nav.Link onClick={()=>navigate('/event')}>Event</Nav.Link>
             <Nav.Link onClick={()=>navigate('/cart')}>Cart</Nav.Link>
+          </Nav>
+          <Nav className="me-auto name">
+            {result.isLoading ? 'Loading...' : result.data.name}
           </Nav>
         </Container>
       </Navbar>
@@ -54,7 +70,11 @@ function App() {
 
       <Routes>
         <Route path='/' element={<Main shoes={shoes}></Main>}></Route>
-        <Route path='/detail/:id' element={<Detail shoes={shoes}></Detail>}></Route>
+        <Route path='/detail/:id' element={
+          <Suspense fallback={<div>로딩중...</div>}>
+            <Detail shoes={shoes}></Detail>
+          </Suspense>
+        }></Route>
         <Route path='/about' element={<About></About>}>
           <Route path='member' element={<div>1</div>}></Route>
           <Route path='location' element={<div>2</div>}></Route>
